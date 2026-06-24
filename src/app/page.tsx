@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Star } from 'lucide-react'
 import { ProductCard } from '@/components/ProductCard'
+import { NewsletterForm } from '@/components/NewsletterForm'
 import { products } from '@/lib/products'
 
 const bestSellers = products.filter((p) => p.isBestSeller).slice(0, 4)
@@ -261,22 +262,7 @@ export default function HomePage() {
         <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto">
           Be first to shop our Friday limited drops. Exclusive pieces, never restocked.
         </p>
-        <form
-          className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="flex-1 bg-white/10 border border-white/20 text-white placeholder-gray-500 px-5 py-3 text-sm focus:outline-none focus:border-evara-gold"
-          />
-          <button
-            type="submit"
-            className="bg-evara-gold text-evara-black px-8 py-3 text-xs tracking-widest uppercase font-semibold hover:bg-evara-gold-light transition-colors"
-          >
-            Join
-          </button>
-        </form>
+        <NewsletterForm dark />
       </section>
     </>
   )

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Instagram, Youtube } from 'lucide-react'
+import { NewsletterFormVertical } from '@/components/NewsletterForm'
 
 export function Footer() {
   return (
@@ -88,19 +89,7 @@ export function Footer() {
             <p className="text-sm text-gray-400 mb-4">
               Get early access to limited drops, exclusive offers & style inspo.
             </p>
-            <form className="flex flex-col gap-3" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="bg-white/10 border border-white/20 text-white placeholder-gray-500 px-4 py-3 text-sm focus:outline-none focus:border-evara-gold"
-              />
-              <button
-                type="submit"
-                className="bg-evara-gold text-evara-black text-xs tracking-widest uppercase font-semibold py-3 hover:bg-evara-gold-light transition-colors"
-              >
-                Subscribe
-              </button>
-            </form>
+            <NewsletterFormVertical />
             <p className="text-xs text-gray-600 mt-3">
               WhatsApp us: <a href="https://wa.me/2348000000000" className="text-evara-gold hover:underline">+234 800 000 0000</a>
             </p>
