@@ -73,8 +73,10 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             <p className="text-evara-muted text-sm mb-6">{product.shortDesc}</p>
 
             {/* Price */}
-            <div className="flex items-baseline gap-3 mb-8">
-              <span className="font-serif text-3xl">{formatPrice(product.price)}</span>
+            <div className="flex items-center gap-4 mb-8">
+              <span className="font-serif text-3xl border-2 border-evara-gold text-evara-gold px-4 py-1.5 tracking-wide">
+                {formatPrice(product.price)}
+              </span>
               {product.originalPrice && (
                 <>
                   <span className="text-evara-muted line-through text-base">

@@ -65,8 +65,8 @@ export function ProductCard({ product }: Props) {
           </h3>
         </Link>
         <p className="text-xs text-evara-muted mt-1 truncate">{product.shortDesc}</p>
-        <div className="flex items-center gap-2 mt-2">
-          <span className="text-sm font-medium">
+        <div className="flex items-center gap-2 mt-3">
+          <span className="border border-evara-gold text-evara-gold font-semibold text-sm px-2 py-0.5 tracking-wide">
             {formatPrice(product.price)}
           </span>
           {product.originalPrice && (

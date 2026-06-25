@@ -1,40 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
-import Stripe from 'stripe'
+import crypto from 'crypto'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
-  const sig = req.headers.get('stripe-signature')!
+  const signature = req.headers.get('x-paystack-signature')
 
-  let event: Stripe.Event
+  // Verify webhook signature
+  const hash = crypto
+    .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY!)
+    .update(body)
+    .digest('hex')
 
-  try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    )
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err)
+  if (hash !== signature) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session
-      console.log('✅ Payment received:', session.id)
+  const event = JSON.parse(body)
+
+  switch (event.event) {
+    case 'charge.success': {
+      const data = event.data
+      console.log('✅ Payment successful:', data.reference)
+      console.log('Customer:', data.customer.email)
+      console.log('Amount:', data.amount / 100, 'NGN')
 
       // TODO:
       // 1. Save order to database (Supabase / MongoDB)
       // 2. Send confirmation email (Resend / Nodemailer)
-      // 3. Update inventory count
-      // 4. Notify admin via WhatsApp/email
+      // 3. Update inventory
+      // 4. Notify admin via WhatsApp
 
       break
     }
-    case 'payment_intent.payment_failed': {
-      const intent = event.data.object as Stripe.PaymentIntent
-      console.log('❌ Payment failed:', intent.id)
+    case 'charge.failed': {
+      console.log('❌ Payment failed:', event.data.reference)
       break
     }
   }

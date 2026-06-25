@@ -1,22 +1,31 @@
 'use client'
 
+import { useState } from 'react'
 import { useCartStore } from '@/store/cart'
 import { formatPrice } from '@/lib/products'
 import { X, Minus, Plus, ShoppingBag, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQty, total } = useCartStore()
   const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
 
   const handleCheckout = async () => {
+    if (!email || !email.includes('@')) {
+      setEmailError('Please enter a valid email')
+      return
+    }
+    setEmailError('')
     setLoading(true)
+
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          email,
           items: items.map((i) => ({
             id: i.product.id,
             name: i.product.name,
@@ -41,10 +50,8 @@ export function CartDrawer() {
 
   return (
     <>
-      {/* Overlay */}
       <div className="overlay" onClick={closeCart} />
 
-      {/* Drawer */}
       <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-evara-cream z-50 flex flex-col shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-evara-gold/20">
@@ -54,10 +61,7 @@ export function CartDrawer() {
               {items.length} {items.length === 1 ? 'item' : 'items'}
             </p>
           </div>
-          <button
-            onClick={closeCart}
-            className="text-evara-black hover:text-evara-gold transition-colors"
-          >
+          <button onClick={closeCart} className="text-evara-black hover:text-evara-gold transition-colors">
             <X size={22} />
           </button>
         </div>
@@ -69,10 +73,7 @@ export function CartDrawer() {
               <ShoppingBag size={48} className="text-evara-gold/40" />
               <p className="font-serif text-xl text-evara-muted">Your bag is empty</p>
               <p className="text-sm text-evara-muted">Add something luxurious</p>
-              <button
-                onClick={closeCart}
-                className="btn-primary text-sm mt-2"
-              >
+              <button onClick={closeCart} className="btn-primary text-sm mt-2">
                 Continue Shopping
               </button>
             </div>
@@ -92,13 +93,10 @@ export function CartDrawer() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-serif text-base leading-tight">{item.product.name}</h3>
-                  {item.size && (
-                    <p className="text-xs text-evara-muted mt-0.5">Size: {item.size}</p>
-                  )}
+                  {item.size && <p className="text-xs text-evara-muted mt-0.5">Size: {item.size}</p>}
                   <p className="text-sm font-medium text-evara-gold mt-1">
                     {formatPrice(item.product.price)}
                   </p>
-
                   <div className="flex items-center justify-between mt-3">
                     <div className="flex items-center gap-2 border border-evara-gold/30">
                       <button
@@ -135,19 +133,29 @@ export function CartDrawer() {
               <span className="text-sm tracking-widest uppercase text-evara-muted">Subtotal</span>
               <span className="font-serif text-xl">{formatPrice(total())}</span>
             </div>
+
+            {/* Email for Paystack */}
+            <div className="mb-3">
+              <input
+                type="email"
+                placeholder="Your email for receipt"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-evara-black/20 px-4 py-2.5 text-sm focus:outline-none focus:border-evara-gold bg-white"
+              />
+              {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
+            </div>
+
             <p className="text-xs text-evara-muted mb-4 text-center">
-              Shipping calculated at checkout
+              Secured by Paystack · Cards, Bank Transfer, USSD
             </p>
+
             <button
               onClick={handleCheckout}
               disabled={loading}
               className="w-full bg-evara-black text-white py-4 text-sm tracking-widest uppercase font-medium hover:bg-evara-gold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              {loading ? 'Redirecting…' : (
-                <>
-                  Checkout <ArrowRight size={16} />
-                </>
-              )}
+              {loading ? 'Redirecting…' : (<>Pay with Paystack <ArrowRight size={16} /></>)}
             </button>
           </div>
         )}
